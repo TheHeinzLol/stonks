@@ -7,8 +7,11 @@ from pprint import pprint
 import pendulum
 
 def print_date():
-    print("---------------start printing------------")
+    print("---------------start printing current------------")
     for item in Path.cwd().iterdir():
+        print(item)
+    print("---------------start printing parent------------")
+    for item in Path.cwd().parent.iterdir():
         print(item)
     return "-------------printed---------------"
     

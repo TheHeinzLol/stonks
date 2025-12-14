@@ -1,4 +1,11 @@
-def get_historical_bars(
+def get_tickers(path_to_json: Path) -> list:
+    if path_to_json is None:
+        return ['aapl', 'nvda']
+    with open(path_to_json, "r") as tickers_file:
+        tickers = json.load(tickers_file)
+    return tickers
+    
+def get_bars(
     tickers_to_search: list[str],
     time_frame: str = "1D",
     date_start: str = None,
