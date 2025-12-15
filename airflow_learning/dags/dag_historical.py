@@ -2,6 +2,18 @@ from airflow.providers.standard.operators.python import PythonOperator
 from airflow.sdk import DAG
 from pathlib import Path
 
+from tasks_alpaca import get_bars, get_minio_credentials, get_tickers, upload_to_bucket
+
+# minio conn
+login_minio, password_minio = get_minio_credentials()
+host = "localhost"
+client = Minio(
+    endpoint=f"{host}:9000",
+    access_key=login,
+    secret_key=password,
+    secure=False
+    )
+
 with DAG(
     dag_id="get_historical_tickers",
     catchup=True,
@@ -24,6 +36,6 @@ with DAG(
         dag=dag)
     save_response = PythonOperator(
         task_id="save_response",
-        python_callable=tasks_alpaca.save_response,
+        python_callable=tasks_alpaca.upload_to_bucket,
         op_kwargs={bucket_name, file_name},
         dag=dag)# these are placeholders

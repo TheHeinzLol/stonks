@@ -8,6 +8,11 @@ services:
     command: server /data --console-address ":9001"
     volumes: 
       - minio-volume:/data
+    networks:
+      - airflow_learning_default
 volumes:
   minio-volume:
+networks:
+  airflow_learning_default:
+    external: True
 
