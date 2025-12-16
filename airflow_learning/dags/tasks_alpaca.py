@@ -1,17 +1,30 @@
 import io
 import os
+import json
 
+from dotenv import load_dotenv
 from minio import Minio
 from minio.error import S3Error
-from dotenv import load_dotenv
-from typing import Union, Tuple
+from pathlib import Path
+from typing import Union, Tuple, Optional
 
-def get_tickers(path_to_json: Path) -> list:
+credentials = {
+        "key": "PKCTYL4MO5SA2QEIZL2TDEJRTA",
+        "secret_key": "DKL2eLVYFcxKzMJtDYbuG3zppWjpwHzsTS1DtHVwc9Cz"
+    }
+headers_alpaca = {
+    "accept": "application/json",
+    "APCA-API-KEY-ID": credentials["key"],
+    "APCA-API-SECRET-KEY": credentials["secret_key"]
+}
+
+def get_tickers(path_to_json: Optional[Path] = None) -> list:
     if path_to_json is None:
-        return ['aapl', 'nvda']
+        return {"tickers_to_search": ['aapl', 'nvda']}
     with open(path_to_json, "r") as tickers_file:
         tickers = json.load(tickers_file)
-    return tickers
+    return {"tickers_to_search": tickers}
+
 
 def get_minio_credentials(path_to_env_file: Union[str, Path] = "../config/minio.env") -> str:
     """This function returns login and password for root user of minio server, getting those from 'minio.env' file.
@@ -24,7 +37,9 @@ def get_minio_credentials(path_to_env_file: Union[str, Path] = "../config/minio.
     if (MINIO_ROOT_USER and MINIO_ROOT_PASSWORD):
         return MINIO_ROOT_USER, MINIO_ROOT_PASSWORD 
     else:
-        print(f"There are no MINIO_ROOT_USER and/or MINIO_ROOT_PASSWORD variables in {path_to_env_file}")
+        print(f"There are no MINIO_ROOT_USER and/or MINIO_ROOT_PASSWORD variables in {path_to_env_file}. Returning 'admin', 'password_admin'")
+        return "admin", "password_admin"
+
 
 def create_bucket(bucket_name: str, client: Minio) -> None:
     found = client.bucket_exists(bucket_name=bucket_name)
@@ -33,6 +48,7 @@ def create_bucket(bucket_name: str, client: Minio) -> None:
         print("Created bucket", bucket_name)
     else:
         print("Bucket", bucket_name, "already exists")
+
 
 def upload_to_bucket(source_file: Union[str, Path, bytes], bucket_name: str, client: Minio, destination_file: str=None) -> None:
     # Make the bucket if it doesn't exist.
@@ -44,19 +60,31 @@ def upload_to_bucket(source_file: Union[str, Path, bytes], bucket_name: str, cli
     client.put_object(
         bucket_name=bucket_name,
         object_name=destination_file,
-        file_path=source_file
+        length=-1,
+        file_path=source_file,
     )
     print(
         "successfully uploaded object", destination_file, "to bucket", bucket_name,
     )
-        
-def get_bars(
+
+
+def get_latest_bars(tickers_to_search):
+    print(tickers_to_search)
+    params = {
+        'symbols': ",".join(tickers_to_search),
+        }
+    url = f"https://data.alpaca.markets/v2/stocks/bars/latest?{urlencode(params)}"
+    response = requests.get(url, headers=headers_alpaca)
+    return response.text
+
+    
+def get_historical_bars(
     tickers_to_search: list[str],
     time_frame: str = "1D",
     date_start: str = None,
     date_end: str = None,
     limit: int = 10000,
-    page_token: str = "") -> Tuple(str, bool):
+    page_token: str = "") -> Tuple[str, bool]:
     """ 
         Saves json in file or prints errors made in arguments.
         Args:
