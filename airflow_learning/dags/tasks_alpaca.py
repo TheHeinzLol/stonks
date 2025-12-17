@@ -53,19 +53,17 @@ def create_bucket(bucket_name: str, client: Minio) -> None:
 def upload_to_bucket(source_file: Union[str, Path, bytes], bucket_name: str, client: Minio, destination_file: str=None) -> None:
     # Make the bucket if it doesn't exist.
     create_bucket(bucket_name, client)
-    # Check if name of file has to be changed before upload:
-    if destination_file is None:
-        destination_file = Path(source_file).name
     # upload file
-    client.put_object(
-        bucket_name=bucket_name,
-        object_name=destination_file,
-        length=-1,
-        file_path=source_file,
-    )
-    print(
-        "successfully uploaded object", destination_file, "to bucket", bucket_name,
-    )
+    try:
+        client.put_object(
+            bucket_name=bucket_name,
+            object_name=destination_file,
+            length=-1,
+            file_path=source_file,
+        )
+        print("Successfully uploaded object", destination_file, "to bucket", bucket_name)
+    except:
+        print("Failed to upload file to bucket")
 
 
 def get_latest_bars(tickers_to_search):

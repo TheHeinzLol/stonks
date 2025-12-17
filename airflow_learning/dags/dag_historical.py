@@ -5,12 +5,12 @@ from pathlib import Path
 from tasks_alpaca import get_bars, get_minio_credentials, get_tickers, upload_to_bucket
 
 # minio conn
-login_minio, password_minio = get_minio_credentials()
+login_minio, password_minio = tasks_alpaca.get_minio_credentials()
 host = "localhost"
 client = Minio(
     endpoint=f"{host}:9000",
-    access_key=login,
-    secret_key=password,
+    access_key=login_minio,
+    secret_key=password_minio,
     secure=False
     )
 
