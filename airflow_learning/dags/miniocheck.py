@@ -36,28 +36,12 @@ client = Minio(
 
 
 @dag(
-    dag_id="get_latest_bars_taskflow",
+    dag_id="minio_check",
     catchup=False,
     tags="stonks",
     start_date=pendulum.now().set(second=0, microsecond=0).in_timezone("UTC").subtract(minutes=15),
     schedule=pendulum.duration(minutes=1))
-def get_realtime_tickers():
-    @task
-    def get_tickers(path_to_json: Optional[Path] = None) -> list:
-        if path_to_json is None:
-            return ['aapl', 'nvda']
-        with open(path_to_json, "r") as tickers_file:
-            tickers = json.load(tickers_file)
-        return tickers
-    @task
-    def get_latest_bars(tickers_to_search):
-        print(tickers_to_search)
-        params = {
-            'symbols': ",".join(tickers_to_search),
-            }
-        url = f"https://data.alpaca.markets/v2/stocks/bars/latest?{urlencode(params)}"
-        response = requests.get(url, headers=headers_alpaca)
-        return response.text
+def check_minio():
     @task    
     def upload_to_bucket(source_file: Union[str, Path, bytes], bucket_name: str, client: Minio, destination_file: str=None) -> None:
         # Make the bucket if it doesn't exist.
@@ -74,7 +58,5 @@ def get_realtime_tickers():
         )
         print("Successfully uploaded object", destination_file, "to bucket", bucket_name)
 
-    tickers = get_tickers()
-    bars = get_latest_bars(tickers)
-    upload_to_bucket(source_file=bars, bucket_name="airflow.learn", client=client, destination_file="{{dag_run.start_date}}")
-get_realtime_tickers()
+    upload_to_bucket(source_file="asss", bucket_name="airflow.learn", client=client, destination_file="{{dag_run.start_date}}")
+check_minio()

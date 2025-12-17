@@ -26,7 +26,7 @@ def get_tickers(path_to_json: Optional[Path] = None) -> list:
     return {"tickers_to_search": tickers}
 
 
-def get_minio_credentials(path_to_env_file: Union[str, Path] = "../config/minio.env") -> str:
+def get_minio_credentials(path_to_env_file: Union[str, Path] = "config/minio.env") -> str:
     """This function returns login and password for root user of minio server, getting those from 'minio.env' file.
     'minio.env' should have MINIO_ROOT_USER and MINIO_ROOT_PASSWORD variables. If there are no such variables, asks user to provide those via input.
     Args:
@@ -38,7 +38,7 @@ def get_minio_credentials(path_to_env_file: Union[str, Path] = "../config/minio.
         return MINIO_ROOT_USER, MINIO_ROOT_PASSWORD 
     else:
         print(f"There are no MINIO_ROOT_USER and/or MINIO_ROOT_PASSWORD variables in {path_to_env_file}. Returning 'admin', 'password_admin'")
-        return "admin", "password_admin"
+        return "admin", "admin_password"
 
 
 def create_bucket(bucket_name: str, client: Minio) -> None:
