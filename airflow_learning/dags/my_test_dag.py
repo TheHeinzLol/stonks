@@ -1,6 +1,6 @@
 
 from airflow.providers.standard.operators.python import PythonOperator
-from airflow.sdk import DAG, task
+from airflow.sdk import dag, task
 from pathlib import Path
 from pprint import pprint
 
