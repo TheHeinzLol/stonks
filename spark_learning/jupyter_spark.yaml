@@ -1,0 +1,16 @@
+services:
+  pyspark:
+    image: quay.io/jupyter/pyspark-notebook:82d322f00937
+    volumes:
+      - ./jupyter_volume:/home/jupyter_volume
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      NotebookApp.token: ""
+      NotebookApp.password: ""
+    ports:
+      - "8887:8888"
+    networks: 
+    - airflow_learning_default
+networks:
+  airflow_learning_default:
+    external: True
