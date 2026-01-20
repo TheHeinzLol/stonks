@@ -211,3 +211,4 @@ __marimo__/
 src/test.txt
 /data/
 */*/*.jar
+*/*/*/*.jar

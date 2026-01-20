@@ -1,0 +1,24 @@
+FROM ubuntu:24.04
+USER root
+WORKDIR /usr/local/my_work
+
+# basic apps and python
+RUN apt update -y && \
+apt install nano -y && \
+apt install wget -y && \
+apt install python3 -y && \
+apt install python3-pip -y
+
+# install java for pyspark
+RUN apt install openjdk-17-jre-headless -y
+
+# download jars for spark-minio connecton
+RUN wget -P ./jars/ https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.4.2/hadoop-aws-3.4.2.jar
+RUN wget -P ./jars/ https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.29.52/bundle-2.29.52.jar
+
+# making virtual environment to avoid warning about system-wide pip installations
+RUN apt install python3-venv -y
+RUN python3 -m venv /usr/local/my_work/venvs/spark
+
+# installing pyspark in venv
+RUN /usr/local/my_work/venvs/spark/bin/pip install pyspark
