@@ -1,0 +1,44 @@
+networks:
+  airflow_learning_default:
+    external: True
+services:
+  spark-master:
+    image: my_first_spark:master
+    build: .
+    container_name: spark-master
+    networks:
+      - airflow_learning_default
+    entrypoint: /bin/bash
+    command: -c "/opt/spark/sbin/start-master.sh; tail -f /dev/null"
+    ports:
+      - '8089:8080'
+      - '4040:4040'
+    volumes:
+      - spark-events:/opt/spark/events
+
+  spark-worker:
+    image: my_first_spark:worker
+    build: .
+    container_name: spark-worker1
+    networks:
+      - airflow_learning_default
+    entrypoint: /bin/bash
+    command: -c "/opt/spark/sbin/start-worker.sh  spark://spark-master:7077; tail -f /dev/null"
+    volumes:
+      - spark-events:/opt/spark/events  
+    
+  spark-history-server:
+    image: my_first_spark:history
+    build: .
+    container_name: spark-history-server
+    networks:
+      - airflow_learning_default
+    entrypoint: /bin/bash
+    command: -c "/opt/spark/sbin/start-history-server.sh; tail -f /dev/null"
+    volumes:
+      - spark-events:/opt/spark/events 
+    ports:
+      - '18080:18080'
+
+volumes:
+  spark-events:

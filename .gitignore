@@ -210,5 +210,4 @@ __marimo__/
 */*.log
 src/test.txt
 /data/
-*/*/*.jar
-*/*/*/*.jar
+*.jar
