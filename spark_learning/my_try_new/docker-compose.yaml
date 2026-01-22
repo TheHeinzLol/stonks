@@ -1,0 +1,12 @@
+services:
+  spark:
+    image: my_try_new:1
+    volumes: 
+      - ./scripts:/opt/spark/work-dir/scripts
+    networks:
+      - airflow_learning_default
+    stdin_open: true
+    tty: true
+networks:
+  airflow_learning_default:
+    external: True

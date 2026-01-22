@@ -1,9 +1,8 @@
 from pyspark.sql import SparkSession
 
-# Create Spark session with MinIO (S3A) configuration
 spark = SparkSession.builder \
     .appName("List MinIO Files") \
-    .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
+    .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9001") \
     .config("spark.hadoop.fs.s3a.access.key", "admin") \
     .config("spark.hadoop.fs.s3a.secret.key", "admin_password") \
     .config("spark.hadoop.fs.s3a.path.style.access", "true") \
@@ -11,21 +10,18 @@ spark = SparkSession.builder \
     .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
     .getOrCreate()
 
-# List files in the bucket using Hadoop FileSystem API
-hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
-fs = spark.sparkContext._jvm.org.apache.hadoop.fs.FileSystem.get(hadoop_conf)
+sc = spark.sparkContext
+jvm = sc._jvm
 
-path = spark.sparkContext._jvm.org.apache.hadoop.fs.Path(
-    "s3a://airflow.learning/"
-)
+uri = jvm.java.net.URI("s3a://airflow.learn/")
+hadoop_conf = sc._jsc.hadoopConfiguration()
+fs = jvm.org.apache.hadoop.fs.FileSystem.get(uri, hadoop_conf)
 
+path = jvm.org.apache.hadoop.fs.Path("s3a://airflow.learn/")
 status = fs.listStatus(path)
 
-print("Files in bucket airflow.learning:")
-for file_status in status:
-    print(
-        f"- {file_status.getPath().toString()} "
-        f"(size={file_status.getLen()} bytes)"
-    )
+print("Files in bucket airflow.learn:")
+for f in status:
+    print(f"- {f.getPath().toString()} (size={f.getLen()} bytes)")
 
 spark.stop()
