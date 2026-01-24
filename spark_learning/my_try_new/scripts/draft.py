@@ -66,25 +66,3 @@ result_df = parsed_df.select(
 
 # Show the result
 result_df.show(truncate=False)
-
-# original
-# try:
-#     # Try UTF-8 decoding
-#     json_string = binary_data.decode('utf-8')
-#     print(json_string)
-#     #json_string = spark.read.text(json_string)
-# except UnicodeDecodeError:
-#     print("Not valid UTF-8, might be compressed or encoded differently")
-
-# bar_schema = StructType([
-#     StructField("ticker", StringType(), False), 
-#     StructField("close", FloatType(), True),
-#     StructField("high", FloatType(), True),
-#     StructField("low", FloatType(), True),
-#     StructField("n", IntegerType(), True),    # number of trades
-#     StructField("open", FloatType(), True),
-#     StructField("time", TimestampType(), True),
-#     StructField("volume", IntegerType(), True),
-#     StructField("vwap", FloatType(), True)      # volume weighted price
-# ])
-
